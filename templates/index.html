@@ -1,0 +1,72 @@
+
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+    <div class="hero-left">
+        <div class="eyebrow">DROP 2026 • SYSTEM-02</div>
+        <h1 class="hero-title">TECNOLOGÍA<br><span class="gradient-text">QUE NO PIDE PERMISO</span></h1>
+        <p class="hero-sub">TorRam System cura teléfonos, tablets, laptops, PCs y hardware que sí rinde. Más software legal y cosméticos (fundas, cargadores, stands) que alargan la vida de tu equipo. Sin planes de renta, sin humo.</p>
+        <div class="hero-actions">
+            <a href="{{ url_for('shop') }}" class="btn btn-xl btn-primary">EXPLORAR TIENDA →</a>
+            <a href="{{ url_for('shop', cat='computadoras') }}" class="btn btn-xl btn-ghost">VER BUILDS CUSTOM</a>
+        </div>
+        <div class="hero-stats">
+            <div><b>16</b><span>productos curados</span></div>
+            <div><b>24H</b><span>envío nacional</span></div>
+            <div><b>12M</b><span>garantía real</span></div>
+        </div>
+    </div>
+    <div class="hero-right">
+        <div class="hero-card main-card">
+            <img src="https://images.unsplash.com/photo-1587202372775-e229f172b9d7?q=80&w=800" alt="PC">
+            <div class="card-info"><span class="badge badge-custom">CUSTOM LAB</span><h3>NEBULA RTX 4090</h3><p>La bestia que armamos este mes</p></div>
+        </div>
+        <div class="hero-card mini-card c1">
+            <span>⚡ 120W GaN</span>
+        </div>
+        <div class="hero-card mini-card c2">
+            <span>KEVLAR REAL</span>
+        </div>
+    </div>
+</section>
+
+<section class="featured">
+    <div class="section-head">
+        <h2>LO MÁS CALIENTE // FEATURED</h2>
+        <a href="{{ url_for('shop') }}" class="link-arrow">Ver todo →</a>
+    </div>
+    <div class="product-grid">
+        {% for p in featured %}
+        <a href="{{ url_for('product_detail', pid=p.id) }}" class="product-card featured-card{% if p.stock_disponible == 0 %} out-of-stock{% endif %}">
+            <div class="pc-image"><img src="{{ p.image }}" alt="{{ p.name }}">{% if p.badge %}<span class="pc-badge">{{ p.badge }}</span>{% endif %}</div>
+            <div class="pc-body"><h3>{{ p.name }}</h3><p class="pc-desc">{{ p.desc }}</p><span class="stock-note{% if p.stock_disponible == 0 %} sold-out-text{% endif %}">{% if p.stock_disponible > 0 %}{{ p.stock_disponible }} disponibles{% else %}AGOTADO{% endif %}</span><div class="pc-price"><span class="price">${{ "{:,}".format(p.price) }}</span>{% if p.old_price %}<span class="old">${{ "{:,}".format(p.old_price) }}</span>{% endif %}</div></div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="categories">
+    <h2 class="section-title">NAVEGA POR SISTEMA</h2>
+    <div class="cat-grid">
+        <a href="{{ url_for('shop', cat='telefonos') }}" class="cat-card cat-telefonos"><span>TELEFONOS</span><b>2</b></a>
+        <a href="{{ url_for('shop', cat='tablets') }}" class="cat-card cat-tablets"><span>TABLETS</span><b>2</b></a>
+        <a href="{{ url_for('shop', cat='laptops') }}" class="cat-card cat-laptops"><span>LAPTOPS</span><b>2</b></a>
+        <a href="{{ url_for('shop', cat='computadoras') }}" class="cat-card cat-computadoras"><span>PCs CUSTOM</span><b>2</b></a>
+        <a href="{{ url_for('shop', cat='hardware') }}" class="cat-card cat-hardware"><span>HARDWARE</span><b>2</b></a>
+        <a href="{{ url_for('shop', cat='software') }}" class="cat-card cat-software"><span>SOFTWARE</span><b>2</b></a>
+        <a href="{{ url_for('shop', cat='cosmeticos') }}" class="cat-card cat-cosmeticos"><span>GEAR / COSMETICOS</span><b>4</b></a>
+    </div>
+</section>
+
+<section class="latest">
+    <div class="section-head"><h2>ÚLTIMOS INGRESOS</h2></div>
+    <div class="product-grid">
+        {% for p in products %}
+        <a href="{{ url_for('product_detail', pid=p.id) }}" class="product-card{% if p.stock_disponible == 0 %} out-of-stock{% endif %}">
+            <div class="pc-image"><img src="{{ p.image }}" alt="{{ p.name }}">{% if p.badge %}<span class="pc-badge">{{ p.badge }}</span>{% endif %}</div>
+            <div class="pc-body"><span class="pc-cat">{{ p.category }}</span><h3>{{ p.name }}</h3><span class="stock-note{% if p.stock_disponible == 0 %} sold-out-text{% endif %}">{% if p.stock_disponible > 0 %}{{ p.stock_disponible }} disponibles{% else %}AGOTADO{% endif %}</span><div class="pc-price"><span class="price">${{ "{:,}".format(p.price) }}</span>{% if p.old_price %}<span class="old">${{ "{:,}".format(p.old_price) }}</span>{% endif %}</div></div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-head"><span class="logo-icon">TR</span><h1>REGISTRO // NUEVO USUARIO</h1><p>Crea tu acceso al lab</p></div>
+        <form method="post" class="auth-form">
+            <div class="field"><label>NOMBRE COMPLETO</label><input type="text" name="name" required placeholder="Ej. Walter Torres"></div>
+            <div class="field"><label>EMAIL</label><input type="email" name="email" required placeholder="tu@torram.mx"></div>
+            <div class="field"><label>PASSWORD</label><input type="password" name="password" required placeholder="Mínimo 6 caracteres"></div>
+            <button class="btn btn-xl btn-primary full">CREAR CUENTA</button>
+        </form>
+        <p class="auth-switch">¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Entra aquí</a></p>
+    </div>
+    <div class="auth-side"><h2>Manifiesto TorRam</h2><p>No spam. No vendemos tu data. Solo hardware que usamos nosotros mismos. Si no pasa nuestro test de 7 días, no se vende.</p><div class="code-block">> new_user.init()<br>> status: awaiting_validation<br>> encryption: AES-256</div></div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="product-detail">
+    <div class="pd-image{% if product.stock_disponible == 0 %} sold-out{% endif %}">
+        <img src="{{ product.image }}" alt="{{ product.name }}">
+        {% if product.badge %}<span class="pd-badge">{{ product.badge }}</span>{% endif %}
+    </div>
+    <div class="pd-info">
+        <span class="pc-cat">{{ product.category }} // ID:{{ product.id }}</span>
+        <h1>{{ product.name }}</h1>
+        <p class="pd-desc">{{ product.desc }}</p>
+        <div class="pd-specs">
+            {% for s in product.specs %}<div class="spec"><span class="spec-dot"></span>{{ s }}</div>{% endfor %}
+        </div>
+        <div class="pd-price-block">
+            <div><span class="price xl">${{ "{:,}".format(product.price) }} MXN</span>{% if product.old_price %}<span class="old">${{ "{:,}".format(product.old_price) }}</span>{% endif %}</div>
+            {% if product.stock_disponible > 0 %}
+            <span class="stock">● QUEDAN {{ product.stock_disponible }} UNIDADES • ENVÍO 24H</span>
+            {% else %}
+            <span class="stock sold-out-text">● AGOTADO TEMPORALMENTE</span>
+            {% endif %}
+        </div>
+        <div class="pd-actions">
+            <form action="{{ url_for('add_to_cart', pid=product.id) }}" method="post" class="pd-add">
+            <div class="qty-input"><label>CANT</label><input type="number" name="qty" value="1" min="1" max="{{ [product.stock_disponible, 10]|min }}" {% if product.stock_disponible == 0 %}disabled{% endif %}></div>
+            <button class="btn btn-xl btn-primary" {% if product.stock_disponible == 0 %}disabled{% endif %}>{% if product.stock_disponible > 0 %}AGREGAR AL CARRITO — ${{ "{:,}".format(product.price) }}{% else %}AGOTADO{% endif %}</button>
+            </form>
+            <form action="{{ url_for('reserve_product', pid=product.id) }}" method="post" class="pd-reserve">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                <button class="btn btn-xl btn-ghost" {% if product.stock_disponible == 0 %}disabled{% endif %}>APARTAR POR 5 MINUTOS</button>
+            </form>
+        </div>
+        <div class="pd-trust">
+            <div><b>↻ 30 días</b> devolución sin preguntas</div>
+            <div><b>⚡ MSI 12 meses</b> con BBVA, Banorte, Santander</div>
+            <div><b>🛡️ Garantía TorRam</b> 1 año directa con nosotros</div>
+        </div>
+    </div>
+</div>
+
+{% if related %}
+<section class="related">
+    <h2>MÁS DE {{ product.category.upper() }}</h2>
+    <div class="product-grid mini">
+        {% for p in related %}
+        <a href="{{ url_for('product_detail', pid=p.id) }}" class="product-card{% if p.stock_disponible == 0 %} out-of-stock{% endif %}">
+            <div class="pc-image"><img src="{{ p.image }}" alt="{{ p.name }}">{% if p.badge %}<span class="pc-badge">{{ p.badge }}</span>{% endif %}</div>
+            <div class="pc-body"><h3>{{ p.name }}</h3><span class="stock-note{% if p.stock_disponible == 0 %} sold-out-text{% endif %}">{% if p.stock_disponible > 0 %}{{ p.stock_disponible }} disponibles{% else %}AGOTADO{% endif %}</span><div class="pc-price"><span class="price">${{ "{:,}".format(p.price) }}</span></div></div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+{% endblock %}

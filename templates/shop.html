@@ -1,0 +1,46 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="shop-header">
+    <h1>TIENDA // {{ active_cat.upper() if active_cat != 'all' else 'TODO' }}</h1>
+    <div class="shop-filters">
+        <a href="{{ url_for('shop', cat='all') }}" class="filter {% if active_cat=='all' %}active{% endif %}">TODO</a>
+        <a href="{{ url_for('shop', cat='telefonos') }}" class="filter {% if active_cat=='telefonos' %}active{% endif %}">TELÉFONOS</a>
+        <a href="{{ url_for('shop', cat='tablets') }}" class="filter {% if active_cat=='tablets' %}active{% endif %}">TABLETS</a>
+        <a href="{{ url_for('shop', cat='laptops') }}" class="filter {% if active_cat=='laptops' %}active{% endif %}">LAPTOPS</a>
+        <a href="{{ url_for('shop', cat='computadoras') }}" class="filter {% if active_cat=='computadoras' %}active{% endif %}">PCs</a>
+        <a href="{{ url_for('shop', cat='hardware') }}" class="filter {% if active_cat=='hardware' %}active{% endif %}">HARDWARE</a>
+        <a href="{{ url_for('shop', cat='software') }}" class="filter {% if active_cat=='software' %}active{% endif %}">SOFTWARE</a>
+        <a href="{{ url_for('shop', cat='cosmeticos') }}" class="filter {% if active_cat=='cosmeticos' %}active{% endif %}">GEAR</a>
+        <a href="{{ url_for('shop', cat='otros') }}" class="filter {% if active_cat=='otros' %}active{% endif %}">OTROS</a>
+    </div>
+</div>
+
+{% if query %}
+<p class="search-info">Resultados para: <b>"{{ query }}"</b> — {{ products|length }} productos</p>
+{% endif %}
+
+<div class="product-grid">
+    {% for p in products %}
+    <div class="product-card{% if p.stock_disponible == 0 %} out-of-stock{% endif %}">
+        <a href="{{ url_for('product_detail', pid=p.id) }}" class="pc-image"><img src="{{ p.image }}" alt="{{ p.name }}">{% if p.badge %}<span class="pc-badge">{{ p.badge }}</span>{% endif %}</a>
+        <div class="pc-body">
+            <span class="pc-cat">{{ p.category }}</span>
+            <a href="{{ url_for('product_detail', pid=p.id) }}"><h3>{{ p.name }}</h3></a>
+            <p class="pc-desc">{{ p.desc }}</p>
+            <div class="pc-specs">{% for s in p.specs %}<span>{{ s }}</span>{% endfor %}</div>
+            <span class="stock-note{% if p.stock_disponible == 0 %} sold-out-text{% endif %}">{% if p.stock_disponible > 0 %}{{ p.stock_disponible }} disponibles{% else %}AGOTADO{% endif %}</span>
+            <div class="pc-footer">
+                <div class="pc-price"><span class="price">${{ "{:,}".format(p.price) }}</span>{% if p.old_price %}<span class="old">${{ "{:,}".format(p.old_price) }}</span>{% endif %}</div>
+                <div class="pc-actions">
+                    <form action="{{ url_for('reserve_product', pid=p.id) }}" method="post"><input type="hidden" name="_csrf_token" value="{{ csrf_token }}"><button class="btn btn-sm btn-ghost" {% if p.stock_disponible == 0 %}disabled{% endif %}>APARTAR 5 MIN</button></form>
+                    <form action="{{ url_for('add_to_cart', pid=p.id) }}" method="post"><input type="hidden" name="qty" value="1"><button class="btn btn-sm btn-primary" {% if p.stock_disponible == 0 %}disabled{% endif %}>{% if p.stock_disponible > 0 %}+ CARRITO{% else %}AGOTADO{% endif %}</button></form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <p class="empty">No hay productos en esta categoría, pero estamos armando algo bien chingón.</p>
+    {% endfor %}
+</div>
+{% endblock %}

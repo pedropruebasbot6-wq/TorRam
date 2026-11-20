@@ -1,0 +1,28 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="success-wrapper">
+    <div class="success-card">
+        <div class="success-icon">✓</div>
+        <h1>PEDIDO CONFIRMADO, LEYENDA</h1>
+        <p>Gracias {{ order.usuario.nombre }}, tu orden ya está en el lab.</p>
+        <div class="order-details">
+            <div class="od-row"><span>ID Pedido:</span><b>{{ order.folio }}</b></div>
+            <div class="od-row"><span>Estado:</span><b class="status status-{{ order.estado|lower|replace(' ', '-') }}">{{ order.estado }}</b></div>
+            <div class="od-row"><span>Email:</span><b>{{ order.usuario.correo }}</b></div>
+            <div class="od-row"><span>Envío a:</span><b>{{ order.direccion.calle }}, {{ order.direccion.ciudad }}, {{ order.direccion.estado }} CP {{ order.direccion.cp }}</b></div>
+            <div class="od-row"><span>Tel:</span><b>{{ order.direccion.telefono }}</b></div>
+            <div class="od-row"><span>Pago:</span><b>{{ order.metodo_pago }}</b></div>
+            <div class="od-row"><span>Total:</span><b>${{ "{:,}".format(order.total) }} MXN</b></div>
+        </div>
+        <div class="order-items">
+            {% for articulo in order.productos %}
+            <div class="oi"><img src="{{ articulo.producto.image }}"><span>{{ articulo.producto.name }} x{{ articulo.cantidad }}</span></div>
+            {% endfor %}
+        </div>
+        <a href="{{ url_for('order_history') }}" class="btn btn-xl btn-primary">VER MIS PEDIDOS</a>
+        <a href="{{ url_for('shop') }}" class="btn btn-xl btn-ghost">SEGUIR COMPRANDO</a>
+        <p class="mono small">Recibirás email con guía de rastreo en 15 min. Si pagaste con OXXO/SPEI, te llega la referencia.</p>
+    </div>
+</div>
+{% endblock %}

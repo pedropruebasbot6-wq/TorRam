@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Reserva temporal - TorRam System{% endblock %}
+{% block content %}
+<section class="reservation-panel">
+    {% if reservation.estado == 'activa' %}
+    <span class="eyebrow">APARTADO TEMPORAL</span>
+    <h1>Tu producto está reservado</h1>
+    <p class="small">Confirma antes de que termine el tiempo para conservar la unidad.</p>
+    <time class="reservation-timer" data-countdown="{{ remaining_seconds }}">05:00</time>
+    <div class="reservation-actions">
+        <form action="{{ url_for('confirm_reservation') }}" method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <button class="btn btn-primary btn-xl">CONFIRMAR RESERVA</button>
+        </form>
+        <form action="{{ url_for('cancel_reservation') }}" method="post">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <button class="btn btn-ghost btn-xl">CANCELAR</button>
+        </form>
+    </div>
+    {% elif reservation.estado == 'confirmada' %}
+    <span class="eyebrow">RESERVA CONFIRMADA</span>
+    <h1>La unidad quedó apartada para ti</h1>
+    <p class="small">Esta reserva ya está confirmada y no volverá a estar disponible como stock.</p>
+    {% elif reservation.estado == 'cancelada' %}
+    <span class="eyebrow">RESERVA CANCELADA</span>
+    <h1>La unidad volvió a estar disponible</h1>
+    <p class="small">Puedes volver a reservarla si todavía hay existencias.</p>
+    {% else %}
+    <span class="eyebrow">RESERVA {{ reservation.estado|upper }}</span>
+    <h1>El tiempo de apartado terminó</h1>
+    <p class="small">La unidad volvió a estar disponible para otros clientes.</p>
+    {% endif %}
+
+    <div class="reservation-product">
+        <img src="{{ product.image }}" alt="{{ product.name }}">
+        <div>
+            <span class="pc-cat">{{ product.category }}</span>
+            <h2>{{ product.name }}</h2>
+            <span class="price">${{ "{:,}".format(product.price) }} MXN</span>
+        </div>
+    </div>
+    <div class="reservation-qr">
+        <div>
+            <span class="eyebrow">CÓDIGO QR DEL COMPROBANTE</span>
+            <p class="small"><a href="{{ ficha_url }}" target="_blank">Abrir ficha pública</a></p>
+            <p class="mono small">{{ ficha_url }}</p>
+        </div>
+        <img src="{{ qr_data_uri }}" alt="QR del comprobante de reserva">
+    </div>
+    <a class="btn btn-ghost" href="{{ url_for('product_detail', pid=product.id) }}">VOLVER AL PRODUCTO</a>
+</section>
+{% endblock %}

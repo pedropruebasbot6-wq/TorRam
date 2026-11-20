@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block title %}Administración - TorRam System{% endblock %}
+{% block content %}
+<section class="dashboard admin-dashboard">
+    <header class="dashboard-heading">
+        <div>
+            <span class="eyebrow">TORRAM // CONTROL</span>
+            <h1>PANEL DE ADMINISTRACIÓN</h1>
+            <p class="admin-subtitle">Inventario, catálogo y pedidos en un solo lugar.</p>
+        </div>
+        <div class="admin-heading-actions">
+            <a class="btn btn-ghost" href="#inventory">INVENTARIO</a>
+            <a class="btn btn-ghost" href="#orders">PEDIDOS</a>
+            <a class="btn btn-primary" href="{{ url_for('shop') }}">VER TIENDA</a>
+        </div>
+    </header>
+
+    <div class="admin-stats" aria-label="Resumen de la tienda">
+        <article class="admin-stat"><span>PRODUCTOS</span><b>{{ products|length }}</b></article>
+        <article class="admin-stat"><span>UNIDADES EN INVENTARIO</span><b>{{ total_stock }}</b></article>
+        <article class="admin-stat"><span>UNIDADES APARTADAS</span><b>{{ reserved_stock }}</b></article>
+        <article class="admin-stat"><span>PEDIDOS</span><b>{{ orders|length }}</b></article>
+    </div>
+
+    <section class="admin-section" id="new-product">
+        <div class="section-heading">
+            <div><span class="eyebrow">CATÁLOGO</span><h2>AGREGAR PRODUCTO</h2></div>
+        </div>
+        <form class="admin-product-form" action="{{ url_for('admin_save_product') }}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+            <div class="admin-form-group">
+                <h3>Información del producto</h3>
+                <div class="admin-form-fields">
+                    <div class="field"><label>NOMBRE</label><input name="name" required maxlength="120"></div>
+                    <div class="field"><label>CATEGORÍA</label><select name="category">{% for category in categories %}<option value="{{ category }}">{{ category|upper }}</option>{% endfor %}</select></div>
+                    <div class="field"><label>PRECIO (MXN)</label><input type="number" name="price" min="0" step="1" required></div>
+                    <div class="field"><label>PRECIO ANTERIOR (MXN)</label><input type="number" name="old_price" min="0" step="1" value="0"></div>
+                    <div class="field"><label>STOCK INICIAL</label><input type="number" name="stock" min="0" step="1" value="0" required></div>
+                    <div class="field"><label>ETIQUETA</label><input name="badge" maxlength="30" placeholder="NUEVO"></div>
+                    <div class="field field-wide"><label>DESCRIPCIÓN</label><textarea name="desc" required rows="3"></textarea></div>
+                    <div class="field field-wide"><label>ESPECIFICACIONES (separadas por coma)</label><input name="specs" placeholder="16GB RAM, 1TB SSD"></div>
+                </div>
+            </div>
+            <div class="admin-form-group">
+                <h3>Imagen</h3>
+                <div class="admin-form-fields">
+                    <div class="field"><label>IMAGEN (URL)</label><input type="url" name="image" placeholder="https://..."></div>
+                    <div class="field"><label>O SUBIR ARCHIVO</label><input type="file" name="image_file" accept="image/*"></div>
+                </div>
+            </div>
+            <button class="btn btn-primary">AGREGAR AL CATÁLOGO</button>
+        </form>
+    </section>
+
+    <section class="admin-section" id="inventory">
+        <div class="section-heading">
+            <div><span class="eyebrow">{{ products|length }} PRODUCTOS</span><h2>INVENTARIO Y CATÁLOGO</h2></div>
+        </div>
+        {% if products %}
+        <div class="admin-category-list">
+            {% for category, category_products in products|groupby('category') %}
+            <section class="admin-category">
+                <h3>{{ category|replace('_', ' ')|upper }} <span>{{ category_products|length }}</span></h3>
+                <div class="admin-product-list">
+                    {% for product in category_products %}
+                    <article class="admin-product-card">
+                        <div class="admin-product-summary">
+                            <img src="{{ product.image }}" alt="{{ product.name }}">
+                            <div>
+                                <span class="pc-cat">ID {{ product.id }} · {{ product.category|upper }}</span>
+                                <h4>{{ product.name }}</h4>
+                                <span class="admin-product-price">${{ "{:,}".format(product.price) }} MXN</span>
+                            </div>
+                            <div class="admin-stock-summary">
+                                <span class="stock-admin-status{% if product.stock_disponible == 0 %} sold-out-text{% endif %}">
+                                    {{ product.stock_disponible }} disponibles
+                                </span>
+                                <small>{{ product.stock }} en inventario · {{ product.reservados }} apartadas</small>
+                            </div>
+                        </div>
+                        <details class="admin-product-edit">
+                            <summary>EDITAR PRODUCTO</summary>
+                            <form class="admin-product-fields" action="{{ url_for('admin_save_product') }}" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                                <input type="hidden" name="id" value="{{ product.id }}">
+                                <div class="field"><label>NOMBRE</label><input name="name" value="{{ product.name }}" required maxlength="120"></div>
+                                <div class="field"><label>CATEGORÍA</label><select name="category">{% for category_option in categories %}<option value="{{ category_option }}" {% if product.category == category_option %}selected{% endif %}>{{ category_option|upper }}</option>{% endfor %}</select></div>
+                                <div class="field"><label>PRECIO (MXN)</label><input type="number" name="price" min="0" step="1" value="{{ product.price }}" required></div>
+                                <div class="field"><label>PRECIO ANTERIOR (MXN)</label><input type="number" name="old_price" min="0" step="1" value="{{ product.old_price }}"></div>
+                                <div class="field"><label>STOCK TOTAL</label><input type="number" name="stock" min="0" step="1" value="{{ product.stock }}" required><small class="stock-admin-status">{{ product.reservados }} unidades apartadas · mínimo permitido</small></div>
+                                <div class="field"><label>ETIQUETA</label><input name="badge" value="{{ product.badge }}" maxlength="30"></div>
+                                <div class="field field-wide"><label>URL DE IMAGEN</label><input type="url" name="image" value="{{ product.image }}"></div>
+                                <div class="field field-wide"><label>SUBIR NUEVA IMAGEN</label><input type="file" name="image_file" accept="image/*"></div>
+                                <div class="field field-wide"><label>DESCRIPCIÓN</label><textarea name="desc" required rows="3">{{ product.desc }}</textarea></div>
+                                <div class="field field-wide"><label>ESPECIFICACIONES (separadas por coma)</label><input name="specs" value="{{ product.specs|join(', ') }}"></div>
+                                <button class="btn btn-primary">GUARDAR CAMBIOS</button>
+                            </form>
+                        </details>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty">Todavía no hay productos en el catálogo.</p>
+        {% endif %}
+    </section>
+
+    <section class="admin-section" id="orders">
+        <div class="section-heading">
+            <div><span class="eyebrow">{{ orders|length }} PEDIDOS</span><h2>GESTIONAR PEDIDOS</h2></div>
+        </div>
+        {% if orders %}
+        <div class="admin-order-list">
+            {% for order in orders %}
+            <article class="admin-order">
+                <div class="admin-order-details">
+                    <b>{{ order.folio }}</b>
+                    <span>{{ order.usuario.nombre }} · {{ order.usuario.correo }}</span>
+                    <span>{{ order.fecha.strftime('%d/%m/%Y %H:%M') }} · ${{ "{:,}".format(order.total) }} MXN</span>
+                    <span class="status status-{{ order.estado|lower|replace(' ', '-') }}">{{ order.estado }}</span>
+                </div>
+                <form action="{{ url_for('admin_update_order', folio=order.folio) }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token }}">
+                    <select name="estado" aria-label="Estado del pedido">{% for state in states %}<option value="{{ state }}" {% if order.estado == state %}selected{% endif %}>{{ state }}</option>{% endfor %}</select>
+                    <button class="btn btn-sm btn-primary">ACTUALIZAR</button>
+                </form>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="empty">Todavía no hay pedidos.</p>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

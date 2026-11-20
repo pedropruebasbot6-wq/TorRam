@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Ficha pública - {{ product.name }}{% endblock %}
+{% block content %}
+<section class="reservation-panel public-ficha">
+    <span class="eyebrow">FICHA PÚBLICA // TORRAM SYSTEM</span>
+    <h1>{{ product.name }}</h1>
+    <div class="reservation-product">
+        <img src="{{ product.image }}" alt="{{ product.name }}">
+        <div>
+            <span class="pc-cat">{{ product.category }} // ID: {{ product.id }}</span>
+            <p class="pd-desc">{{ product.desc }}</p>
+            <span class="price">${{ "{:,}".format(product.price) }} MXN</span>
+            {% if product.stock_disponible > 0 %}
+            <p class="stock">DISPONIBLE · {{ product.stock_disponible }} UNIDAD/ES</p>
+            {% else %}
+            <p class="stock sold-out-text">RESERVADO O AGOTADO</p>
+            {% endif %}
+        </div>
+    </div>
+    <a class="btn btn-ghost" href="{{ url_for('product_detail', pid=product.id) }}">VER EN LA TIENDA</a>
+</section>
+{% endblock %}

@@ -1,0 +1,46 @@
+
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">CARRITO [{{ items|length }}]</h1>
+{% if not items %}
+<div class="empty-cart">
+    <h2>Tu carrito está más vacío que el refri a fin de mes</h2>
+    <p>Lánzate a la tienda y arma tu setup.</p>
+    <a href="{{ url_for('shop') }}" class="btn btn-primary">IR A TIENDA</a>
+</div>
+{% else %}
+<div class="cart-layout">
+    <div class="cart-items">
+        <form action="{{ url_for('update_cart') }}" method="post" id="cart-form">
+        {% for item in items %}
+        <div class="cart-item">
+            <img src="{{ item.product.image }}" alt="{{ item.product.name }}">
+            <div class="ci-info">
+                <span class="pc-cat">{{ item.product.category }}</span>
+                <h3>{{ item.product.name }}</h3>
+                <p>{{ item.product.desc }}</p>
+                <span class="stock-note{% if item.product.stock_disponible == 0 %} sold-out-text{% endif %}">{% if item.product.stock_disponible > 0 %}{{ item.product.stock_disponible }} disponibles{% else %}AGOTADO{% endif %}</span>
+            </div>
+            <div class="ci-qty">
+                <input type="number" name="qty_{{ item.product.id }}" value="{{ item.qty }}" min="0" max="{{ item.product.stock_disponible }}">
+                <span class="ci-price">${{ "{:,}".format(item.product.price) }}</span>
+            </div>
+            <div class="ci-sub">${{ "{:,}".format(item.subtotal) }}</div>
+            <a href="{{ url_for('remove_from_cart', pid=item.product.id) }}" class="ci-remove">✕</a>
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn btn-ghost">ACTUALIZAR CANTIDADES</button>
+        </form>
+    </div>
+    <div class="cart-summary">
+        <h3>RESUMEN</h3>
+        <div class="cs-row"><span>Subtotal</span><span>${{ "{:,}".format(total) }}</span></div>
+        <div class="cs-row"><span>Envío</span><span class="free">GRATIS</span></div>
+        <div class="cs-row total"><span>Total</span><span>${{ "{:,}".format(total) }}</span></div>
+        <a href="{{ url_for('checkout') }}" class="btn btn-xl btn-primary full{% if not can_checkout %} disabled{% endif %}" {% if not can_checkout %}aria-disabled="true"{% endif %}>CHECKOUT →</a>
+        <p class="mono small">Pagos seguros • Encriptado • Factura automática</p>
+        <div class="cs-payments">VISA • MASTERCARD • AMEX • PAYPAL • OXXO • SPEI</div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

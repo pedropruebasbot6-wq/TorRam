@@ -1,0 +1,16 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-head"><span class="logo-icon">TR</span><h1>LOGIN // TORRAM</h1><p>Entra a tu laboratorio</p></div>
+        <form method="post" class="auth-form">
+            <div class="field"><label>EMAIL</label><input type="email" name="email" required placeholder="tu@torram.mx"></div>
+            <div class="field"><label>PASSWORD</label><input type="password" name="password" required placeholder="••••••••"></div>
+            <button class="btn btn-xl btn-primary full">ENTRAR AL SISTEMA</button>
+        </form>
+        <p class="auth-switch">¿No tienes cuenta? <a href="{{ url_for('register') }}">Regístrate chingón aquí</a></p>
+    </div>
+    <div class="auth-side"><h2>¿Por qué crear cuenta en TorRam?</h2><ul><li>→ Historial de pedidos y garantías</li><li>→ Builds guardados y cotizaciones</li><li>→ Acceso anticipado a drops</li><li>→ Soporte prioritario 24/7</li></ul><div class="code-block">> system.auth.success<br>> welcome_back: {{ current_user.name if current_user else 'invitado' }}</div></div>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+
+{% extends "base.html" %}
+{% block content %}
+<h1 class="page-title">CHECKOUT // PAGO SEGURO</h1>
+<div class="checkout-layout">
+    <form method="post" class="checkout-form">
+        <div class="checkout-section">
+            <h3>01 // DIRECCIÓN DE ENVÍO</h3>
+            <div class="grid-2">
+                <div class="field"><label>CALLE Y NÚMERO</label><input type="text" name="calle" required placeholder="Calle 67 #123 entre 50 y 52"></div>
+                <div class="field"><label>CIUDAD</label><input type="text" name="ciudad" required placeholder="Felipe Carrillo Puerto"></div>
+                <div class="field"><label>ESTADO</label><input type="text" name="estado" required placeholder="Quintana Roo"></div>
+                <div class="field"><label>CÓDIGO POSTAL</label><input type="text" name="cp" required placeholder="77200"></div>
+                <div class="field full"><label>TELÉFONO (para paquetería)</label><input type="text" name="telefono" required placeholder="983 123 4567"></div>
+            </div>
+        </div>
+
+        <div class="checkout-section">
+            <h3>02 // FORMA DE PAGO</h3>
+            <div class="payment-options">
+                <label class="pay-opt"><input type="radio" name="pago" value="Tarjeta Crédito/Débito" checked><div><b>💳 Tarjeta</b><span>Visa, MC, Amex — MSI 3,6,12 meses</span></div></label>
+                <label class="pay-opt"><input type="radio" name="pago" value="PayPal"><div><b>🅿️ PayPal</b><span>Paga en 1 clic, protección comprador</span></div></label>
+                <label class="pay-opt"><input type="radio" name="pago" value="OXXO Pay"><div><b>🏪 OXXO Pay</b><span>Generamos referencia, pagas en OXXO</span></div></label>
+                <label class="pay-opt"><input type="radio" name="pago" value="SPEI"><div><b>🏦 Transferencia SPEI</b><span>-5% extra si pagas por SPEI</span></div></label>
+            </div>
+            <div id="card-fields" class="card-fields">
+                <div class="grid-2">
+                    <div class="field full"><label>NÚMERO DE TARJETA</label><input type="text" placeholder="4242 4242 4242 4242"></div>
+                    <div class="field"><label>EXP</label><input type="text" placeholder="12/28"></div>
+                    <div class="field"><label>CVC</label><input type="text" placeholder="123"></div>
+                    <div class="field full"><label>NOMBRE EN TARJETA</label><input type="text" placeholder="Como aparece en tarjeta"></div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn btn-xl btn-primary full">PAGAR ${{ "{:,}".format(total) }} MXN →</button>
+        <p class="mono small center">Pago encriptado con Stripe • No guardamos tu tarjeta • Factura CFDI 4.0 automática</p>
+    </form>
+
+    <div class="checkout-summary">
+        <h3>TU PEDIDO</h3>
+        {% for item in items %}
+        <div class="cs-item"><span>{{ item.product.name }} x{{ item.qty }}</span><span>${{ "{:,}".format(item.subtotal) }}</span></div>
+        {% endfor %}
+        <div class="cs-row total"><span>Total</span><span>${{ "{:,}".format(total) }}</span></div>
+        <div class="trust-box">✓ Envío gratis nacional<br>✓ Garantía 12 meses<br>✓ Devolución 30 días</div>
+    </div>
+</div>
+{% endblock %}

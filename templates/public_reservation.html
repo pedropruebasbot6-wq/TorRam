@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Comprobante {{ reservation.reserva_id[:12] }}{% endblock %}
+{% block content %}
+<section class="reservation-panel public-ficha">
+    <span class="eyebrow">COMPROBANTE DE RESERVA</span>
+    <h1>Estado: {{ reservation.estado|upper }}</h1>
+    {% if reservation.estado == 'activa' %}
+    <time class="reservation-timer" data-countdown="{{ remaining_seconds }}">
+        {{ "%02d:%02d"|format((remaining_seconds // 60), (remaining_seconds % 60)) }}
+    </time>
+    {% endif %}
+    <div class="reservation-product">
+        <img src="{{ product.image }}" alt="{{ product.name }}">
+        <div>
+            <span class="pc-cat">FOLIO: {{ reservation.reserva_id }}</span>
+            <h2>{{ product.name }}</h2>
+            <p>Cantidad: {{ reservation.cantidad }}</p>
+            <p>Estado actualizado: {{ reservation.estado|capitalize }}</p>
+        </div>
+    </div>
+    <a class="btn btn-ghost" href="{{ url_for('public_product_detail', pid=product.id) }}">ABRIR FICHA PÚBLICA</a>
+</section>
+{% endblock %}
